@@ -1,3 +1,4 @@
+
 export default async function handler(req, res) {
   var API_KEY = "d6314q1r01qnpqnvdi40d6314q1r01qnpqnvdi4g";
   var defaultSymbols = ["AMZN","GOOGL","MSFT","NVDA","AAPL","TSLA","META","PLTR","QQQ"];
