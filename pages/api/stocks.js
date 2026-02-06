@@ -1,26 +1,31 @@
 export default async function handler(req, res) {
   var symbols = ["AMZN","GOOGL","MSFT","NVDA","AAPL","TSLA","META","PLTR","QQQ"];
-  var url = "https://query1.finance.yahoo.com/v7/finance/quote?symbols=" + symbols.join(",");
   
   try {
-    var response = await fetch(url, {
-      headers: { "User-Agent": "Mozilla/5.0" }
-    });
-    var data = await response.json();
-    var stocks = data.quoteResponse.result.map(function(q) {
-      return {
-        symbol: q.symbol,
-        price: q.regularMarketPrice || 0,
-        change: q.regularMarketChange || 0,
-        changePercent: q.regularMarketChangePercent || 0,
-        afterHoursPrice: q.postMarketPrice || null,
-        afterHoursChange: q.postMarketChange || null,
-        afterHoursPercent: q.postMarketChangePercent || null,
-        marketTime: q.regularMarketTime || null
-      };
-    });
+    var url = "https://query2.finance.yahoo.com/v10/finance/quoteSummary/" + symbols[0] + "?modules=price";
+    var stocks = [];
+    
+    for (var i = 0; i < symbols.length; i++) {
+      var sym = symbols[i];
+      var r = await fetch("https://query2.finance.yahoo.com/v10/finance/quoteSummary/" + sym + "?modules=price", {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+        }
+      });
+      var d = await r.json();
+      if (d.quoteSummary && d.quoteSummary.result) {
+        var p = d.quoteSummary.result[0].price;
+        stocks.push({
+          symbol: sym,
+          price: p.regularMarketPrice ? p.regularMarketPrice.raw : 0,
+          change: p.regularMarketChange ? p.regularMarketChange.raw : 0,
+          changePercent: p.regularMarketChangePercent ? p.regularMarketChangePercent.raw * 100 : 0
+        });
+      }
+    }
+    
     res.status(200).json({ stocks: stocks, updated: new Date().toISOString() });
   } catch (e) {
-    res.status(500).json({ error: "Failed to fetch", message: e.message });
+    res.status(500).json({ error: "Failed", message: e.message });
   }
 }
