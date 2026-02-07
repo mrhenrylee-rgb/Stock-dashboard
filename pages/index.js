@@ -2,47 +2,47 @@ import { useState, useEffect } from "react";
 import Head from "next/head";
 
 var DEFAULT_DATA = {
-  AMZN: { name: "Amazon.com", contextType: "EARNINGS SHOCK", marketContext: { market: 40, stock: 60 }, contextNarrative: "AMZN crash is 60% stock-specific (capex shock) and 40% market. AWS +20% ignored as $200B spending terrifies investors.", attribution: [{ factor: "$200B capex guidance", pct: 45, why: "Massive AI spend spooked investors" }, { factor: "Slight EPS miss", pct: 25, why: "Even 2-cent misses punished" }, { factor: "AWS +20% overlooked", pct: -15, why: "Best cloud quarter providing floor" }], signal: { action: "BUY THE PANIC", confidence: 72, reasoning: "AWS +20% phenomenal. Entry $195-210." }, summary: "Crashing on $200B capex shock. AWS crushed it but AI spending fears dominate.", news: [{ headline: "CRASHES on $200B capex shock", source: "CNBC", url: "https://cnbc.com", age: "1d", weight: 100, sent: "neg" }, { headline: "AWS beats +20% YoY", source: "TechCrunch", url: "https://techcrunch.com", age: "1d", weight: 85, sent: "pos" }] },
-  GOOGL: { name: "Alphabet Inc", contextType: "POST-EARNINGS", marketContext: { market: 50, stock: 50 }, contextNarrative: "GOOGL is 50/50 market vs stock. Half is hyperscaler capex contagion, half is digesting $175-185B capex.", attribution: [{ factor: "Capex digestion", pct: 45, why: "55% higher than expected" }, { factor: "Cloud +48% overlooked", pct: -25, why: "Best cloud growth ignored" }], signal: { action: "BUY", confidence: 72, reasoning: "Cloud +48% justifies capex. Entry $310-325." }, summary: "Down digesting $175-185B capex guidance. Cloud +48% phenomenal.", news: [{ headline: "Capex shocked market", source: "Bloomberg", url: "https://bloomberg.com", age: "2d", weight: 95, sent: "neg" }, { headline: "Cloud revenue +48%", source: "CNBC", url: "https://cnbc.com", age: "2d", weight: 90, sent: "pos" }] },
-  MSFT: { name: "Microsoft Corp", contextType: "SOFTWARE RECOVERY", marketContext: { market: 60, stock: 40 }, contextNarrative: "MSFT bouncing with software sector. At 25.7x PE, cheapest Mag 7 stock.", attribution: [{ factor: "Software sector bounce", pct: 40, why: "IGV recovering from lows" }, { factor: "Azure growth steady", pct: 30, why: "39% growth reassuring" }], signal: { action: "STRONG BUY", confidence: 78, reasoning: "Best enterprise software at 25.7x PE. Target $480." }, summary: "Recovering from lows. Software being repriced but MSFT has best AI positioning.", news: [{ headline: "Software stocks bouncing", source: "Motley Fool", url: "https://fool.com", age: "1d", weight: 90, sent: "pos" }] },
-  NVDA: { name: "NVIDIA Corp", contextType: "AI LEADER", marketContext: { market: 55, stock: 45 }, contextNarrative: "NVDA bouncing hard on AI momentum. Blackwell demand strong.", attribution: [{ factor: "AI demand acceleration", pct: 50, why: "Blackwell orders exceeding expectations" }, { factor: "Gaming concerns fading", pct: -20, why: "Datacenter dominates narrative" }], signal: { action: "ACCUMULATE", confidence: 75, reasoning: "Best AI play. Buy $170-185, target $220+." }, summary: "Bouncing on continued AI strength. Feb 25 earnings key catalyst.", news: [{ headline: "Blackwell demand strong", source: "Reuters", url: "https://reuters.com", age: "1d", weight: 95, sent: "pos" }] },
-  AAPL: { name: "Apple Inc", contextType: "SAFE HAVEN", marketContext: { market: 30, stock: 70 }, contextNarrative: "AAPL is 70% stock-specific (flight to quality). Apple at 28x with hardware moat.", attribution: [{ factor: "Flight to quality", pct: 45, why: "Stable megacap demand" }, { factor: "No capex overhang", pct: 30, why: "AI via partnerships" }], signal: { action: "HOLD", confidence: 68, reasoning: "Safe haven. Wait for $265-270 to add." }, summary: "Outperforming in volatile market. Flight to quality.", news: [{ headline: "Outperforms in volatile tape", source: "Bloomberg", url: "https://bloomberg.com", age: "1d", weight: 90, sent: "pos" }] },
-  TSLA: { name: "Tesla Inc", contextType: "BOUNCE", marketContext: { market: 40, stock: 60 }, contextNarrative: "TSLA bouncing with risk-on sentiment. Still 377x PE.", attribution: [{ factor: "Risk-on bounce", pct: 40, why: "Speculative names rallying" }, { factor: "Sales concerns remain", pct: 30, why: "EU still weak" }], signal: { action: "AVOID", confidence: 55, reasoning: "377x PE for declining sales. Wait for $350." }, summary: "Bouncing but valuation still extreme vs fundamentals.", news: [{ headline: "EV stocks bouncing", source: "CNBC", url: "https://cnbc.com", age: "1d", weight: 85, sent: "pos" }] },
-  META: { name: "Meta Platforms", contextType: "CAPEX FEARS", marketContext: { market: 50, stock: 50 }, contextNarrative: "META 50/50. Capex concerns vs strong ad business.", attribution: [{ factor: "AI capex concerns", pct: 40, why: "$115-135B guidance" }, { factor: "Ad business strong", pct: -30, why: "Reels gaining share" }], signal: { action: "BUY", confidence: 70, reasoning: "Best ad company. Buy $640-665, target $750." }, summary: "Down from highs on capex but ad fundamentals strong.", news: [{ headline: "Ad revenue beats", source: "Bloomberg", url: "https://bloomberg.com", age: "1w", weight: 90, sent: "pos" }] },
-  PLTR: { name: "Palantir Tech", contextType: "HIGH MULTIPLE", marketContext: { market: 40, stock: 60 }, contextNarrative: "PLTR bouncing but still 200x+ PE. Growth strong but priced in.", attribution: [{ factor: "Growth momentum", pct: 40, why: "70% revenue growth" }, { factor: "Extreme valuation", pct: 35, why: "200x+ PE" }], signal: { action: "TRIM", confidence: 58, reasoning: "Take profits on bounces. Re-enter at $100-110." }, summary: "Strong growth but valuation extreme. Trim into strength.", news: [{ headline: "Revenue surged 70%", source: "Palantir IR", url: "https://palantir.com", age: "1w", weight: 90, sent: "pos" }] },
-  QQQ: { name: "Invesco QQQ", contextType: "TECH INDEX", marketContext: { market: 90, stock: 10 }, contextNarrative: "QQQ is 90% market. Tech bouncing from oversold.", attribution: [{ factor: "Oversold bounce", pct: 50, why: "RSI was 24" }, { factor: "Rotation back to growth", pct: 30, why: "Rates stabilizing" }], signal: { action: "HOLD", confidence: 65, reasoning: "Bounce in progress. Hold positions." }, summary: "Tech bouncing from oversold levels.", news: [{ headline: "Tech rebounds from lows", source: "Bloomberg", url: "https://bloomberg.com", age: "1d", weight: 95, sent: "pos" }] }
+  AMZN: { name: "Amazon.com", contextType: "EARNINGS SHOCK", marketContext: { market: 40, stock: 60 }, contextNarrative: "AMZN crash is 60% stock-specific (capex shock) and 40% market. AWS +20% ignored as $200B spending terrifies investors.", attribution: [{ factor: "$200B capex guidance", pct: 45, why: "Massive AI spend spooked investors" }, { factor: "Slight EPS miss", pct: 25, why: "Even 2-cent misses punished" }, { factor: "AWS +20% overlooked", pct: -15, why: "Best cloud quarter providing floor" }], signal: { action: "BUY THE PANIC", confidence: 72, reasoning: "AWS +20% phenomenal. Entry $195-210." }, summary: "Crashing on $200B capex shock. AWS crushed it but AI spending fears dominate." },
+  GOOGL: { name: "Alphabet Inc", contextType: "POST-EARNINGS", marketContext: { market: 50, stock: 50 }, contextNarrative: "GOOGL is 50/50 market vs stock. Half is hyperscaler capex contagion, half is digesting $175-185B capex.", attribution: [{ factor: "Capex digestion", pct: 45, why: "55% higher than expected" }, { factor: "Cloud +48% overlooked", pct: -25, why: "Best cloud growth ignored" }], signal: { action: "BUY", confidence: 72, reasoning: "Cloud +48% justifies capex. Entry $310-325." }, summary: "Down digesting $175-185B capex guidance. Cloud +48% phenomenal." },
+  MSFT: { name: "Microsoft Corp", contextType: "SOFTWARE RECOVERY", marketContext: { market: 60, stock: 40 }, contextNarrative: "MSFT bouncing with software sector. At 25.7x PE, cheapest Mag 7 stock.", attribution: [{ factor: "Software sector bounce", pct: 40, why: "IGV recovering from lows" }, { factor: "Azure growth steady", pct: 30, why: "39% growth reassuring" }], signal: { action: "STRONG BUY", confidence: 78, reasoning: "Best enterprise software at 25.7x PE. Target $480." }, summary: "Recovering from lows. Software being repriced but MSFT has best AI positioning." },
+  NVDA: { name: "NVIDIA Corp", contextType: "AI LEADER", marketContext: { market: 55, stock: 45 }, contextNarrative: "NVDA bouncing hard on AI momentum. Blackwell demand strong.", attribution: [{ factor: "AI demand acceleration", pct: 50, why: "Blackwell orders exceeding expectations" }, { factor: "Gaming concerns fading", pct: -20, why: "Datacenter dominates narrative" }], signal: { action: "ACCUMULATE", confidence: 75, reasoning: "Best AI play. Buy $170-185, target $220+." }, summary: "Bouncing on continued AI strength. Feb 25 earnings key catalyst." },
+  AAPL: { name: "Apple Inc", contextType: "SAFE HAVEN", marketContext: { market: 30, stock: 70 }, contextNarrative: "AAPL is 70% stock-specific (flight to quality). Apple at 28x with hardware moat.", attribution: [{ factor: "Flight to quality", pct: 45, why: "Stable megacap demand" }, { factor: "No capex overhang", pct: 30, why: "AI via partnerships" }], signal: { action: "HOLD", confidence: 68, reasoning: "Safe haven. Wait for $265-270 to add." }, summary: "Outperforming in volatile market. Flight to quality." },
+  TSLA: { name: "Tesla Inc", contextType: "BOUNCE", marketContext: { market: 40, stock: 60 }, contextNarrative: "TSLA bouncing with risk-on sentiment. Still 377x PE.", attribution: [{ factor: "Risk-on bounce", pct: 40, why: "Speculative names rallying" }, { factor: "Sales concerns remain", pct: 30, why: "EU still weak" }], signal: { action: "AVOID", confidence: 55, reasoning: "377x PE for declining sales. Wait for $350." }, summary: "Bouncing but valuation still extreme vs fundamentals." },
+  META: { name: "Meta Platforms", contextType: "CAPEX FEARS", marketContext: { market: 50, stock: 50 }, contextNarrative: "META 50/50. Capex concerns vs strong ad business.", attribution: [{ factor: "AI capex concerns", pct: 40, why: "$115-135B guidance" }, { factor: "Ad business strong", pct: -30, why: "Reels gaining share" }], signal: { action: "BUY", confidence: 70, reasoning: "Best ad company. Buy $640-665, target $750." }, summary: "Down from highs on capex but ad fundamentals strong." },
+  PLTR: { name: "Palantir Tech", contextType: "HIGH MULTIPLE", marketContext: { market: 40, stock: 60 }, contextNarrative: "PLTR bouncing but still 200x+ PE. Growth strong but priced in.", attribution: [{ factor: "Growth momentum", pct: 40, why: "70% revenue growth" }, { factor: "Extreme valuation", pct: 35, why: "200x+ PE" }], signal: { action: "TRIM", confidence: 58, reasoning: "Take profits on bounces. Re-enter at $100-110." }, summary: "Strong growth but valuation extreme. Trim into strength." },
+  QQQ: { name: "Invesco QQQ", contextType: "TECH INDEX", marketContext: { market: 90, stock: 10 }, contextNarrative: "QQQ is 90% market. Tech bouncing from oversold.", attribution: [{ factor: "Oversold bounce", pct: 50, why: "RSI was 24" }, { factor: "Rotation back to growth", pct: 30, why: "Rates stabilizing" }], signal: { action: "HOLD", confidence: 65, reasoning: "Bounce in progress. Hold positions." }, summary: "Tech bouncing from oversold levels." }
 };
 
 export default function Dashboard() {
   var priceState = useState({});
   var prices = priceState[0];
   var setPrices = priceState[1];
-  
+
+  var newsState = useState({});
+  var news = newsState[0];
+  var setNews = newsState[1];
+
   var watchState = useState(["AMZN","GOOGL","MSFT","NVDA","AAPL","TSLA","META","PLTR","QQQ"]);
   var watchlist = watchState[0];
   var setWatchlist = watchState[1];
-  
+
   var selState = useState("AMZN");
   var selected = selState[0];
   var setSelected = selState[1];
-  
+
   var tickState = useState("");
   var newTicker = tickState[0];
   var setNewTicker = tickState[1];
-  
+
   var loadState = useState(false);
   var loading = loadState[0];
   var setLoading = loadState[1];
-  
+
   var updateState = useState(null);
   var lastUpdate = updateState[0];
   var setLastUpdate = updateState[1];
 
-    var newsState = useState({});
-  var news = newsState[0];
-  var setNews = newsState[1];
-
-function fetchPrices(tickers) {
+  function fetchPrices(tickers) {
     var syms = tickers || watchlist;
     setLoading(true);
     fetch("/api/stocks?symbols=" + syms.join(","))
@@ -50,9 +50,7 @@ function fetchPrices(tickers) {
       .then(function(data) {
         if (data.stocks) {
           var p = {};
-          data.stocks.forEach(function(s) {
-            p[s.symbol] = s;
-          });
+          data.stocks.forEach(function(s) { p[s.symbol] = s; });
           setPrices(p);
           setLastUpdate(new Date());
         }
@@ -61,7 +59,7 @@ function fetchPrices(tickers) {
       .catch(function() { setLoading(false); });
   }
 
-    function fetchNews(symbol) {
+  function fetchNews(symbol) {
     fetch("/api/news?symbol=" + symbol)
       .then(function(r) { return r.json(); })
       .then(function(data) {
@@ -76,34 +74,8 @@ function fetchPrices(tickers) {
       .catch(function() {});
   }
 
-    function fetchNews(symbol) {
-    fetch("/api/news?symbol=" + symbol)
-      .then(function(r) { return r.json(); })
-      .then(function(data) {
-        if (data.news) {
-          setNews(function(prev) {
-            var updated = Object.assign({}, prev);
-            updated[symbol] = data.news;
-            return updated;
-          });
-        }
-      })
-      .catch(function() {});
-  }
-
-  useEffect(function() {
-    if (selected) fetchNews(selected);
-  }, [selected]);
-
-
-  useEffect(function() {
-    fetchPrices(watchlist);
-  }, [watchlist]);
-
-    useEffect(function() {
-    if (selected) fetchNews(selected);
-  }, [selected]);
-
+  useEffect(function() { fetchPrices(watchlist); }, [watchlist]);
+  useEffect(function() { if (selected) fetchNews(selected); }, [selected]);
 
   function addTicker() {
     var t = newTicker.toUpperCase().trim();
@@ -126,11 +98,8 @@ function fetchPrices(tickers) {
     return "#eab308";
   }
 
-  function sentColor(x) { return x === "pos" ? "#22c55e" : x === "neg" ? "#ef4444" : "#6b7280"; }
   function fmt(p) { return p ? (p > 1000 ? p.toLocaleString(undefined,{maximumFractionDigits:0}) : p.toFixed(2)) : "0.00"; }
-
-  var info = DEFAULT_DATA[selected] || { name: selected, contextType: "NEW", marketContext: {market:50,stock:50}, contextNarrative: "No analysis yet.", attribution: [], signal: {action:"ANALYZE",confidence:0,reasoning:"Ask Claude to analyze."}, summary: "No data.", news: [] };
-  var pr = prices[selected] || { price: 0, change: 0, changePercent: 0 };
+  function timeAgo(ts) { if (!ts) return ""; var diff = Date.now() - ts * 1000; var hrs = Math.floor(diff / 3600000); if (hrs < 1) return "now​​​​​​​​​​​​​​​​
   return (
     <div>
       <Head><title>Stock Dashboard</title></Head>
@@ -140,7 +109,7 @@ function fetchPrices(tickers) {
             <h1 style={{fontSize:18,fontWeight:"bold",margin:0}}>Stock Dashboard</h1>
             <div style={{fontSize:10,color:"#64748b"}}>Updated: {lastUpdate ? lastUpdate.toLocaleTimeString() : "--"}</div>
           </div>
-          <button onClick={fetchPrices} disabled={loading} style={{background:"#3b82f6",border:"none",borderRadius:6,padding:"8px 16px",color:"white",fontWeight:"bold",cursor:"pointer",opacity:loading?0.5:1}}>{loading ? "..." : "Refresh"}</button>
+          <button onClick={function(){fetchPrices(watchlist);fetchNews(selected);}} disabled={loading} style={{background:"#3b82f6",border:"none",borderRadius:6,padding:"8px 16px",color:"white",fontWeight:"bold",cursor:"pointer",opacity:loading?0.5:1}}>{loading ? "..." : "Refresh"}</button>
         </div>
         <div style={{display:"flex",gap:8,marginBottom:12}}>
           <input type="text" value={newTicker} onChange={function(e){setNewTicker(e.target.value.toUpperCase());}} onKeyDown={function(e){if(e.key==="Enter")addTicker();}} placeholder="Add ticker..." style={{flex:1,maxWidth:150,background:"#1e293b",border:"1px solid #334155",borderRadius:6,padding:"8px 12px",color:"white",fontSize:14}}/>
@@ -188,10 +157,12 @@ function fetchPrices(tickers) {
           </div>
           {info.attribution.length>0&&<div style={{marginBottom:12}}><div style={{fontSize:11,color:"#9ca3af",marginBottom:8}}>WHY ITS MOVING</div>{info.attribution.map(function(a,i){return(<div key={i} style={{background:"#111827",borderRadius:6,padding:8,marginBottom:6}}><div style={{display:"flex",justifyContent:"space-between",marginBottom:2}}><span style={{fontWeight:600,fontSize:11}}>{a.factor}</span><span style={{background:a.pct>0?"#7f1d1d":"#14532d",color:a.pct>0?"#fca5a5":"#86efac",padding:"1px 6px",borderRadius:4,fontSize:10,fontWeight:600}}>{a.pct>0?"+":""}{a.pct}%</span></div><div style={{fontSize:10,color:"#9ca3af"}}>{a.why}</div></div>);})}</div>}
           <div style={{background:"#111827",borderRadius:8,padding:10,marginBottom:12}}><div style={{fontSize:10,color:"#9ca3af",marginBottom:4}}>SUMMARY</div><div style={{fontSize:12,color:"#d1d5db"}}>{info.summary}</div></div>
-          {info.news.length>0&&<div><div style={{fontSize:11,color:"#9ca3af",marginBottom:8}}>NEWS</div>{info.news.map(function(n,i){return(<div key={i} style={{display:"flex",alignItems:"flex-start",gap:8,padding:8,background:i%2===0?"#111827":"transparent",borderRadius:6,marginBottom:2}}><div style={{width:6,height:6,borderRadius:"50%",background:sentColor(n.sent),marginTop:4,flexShrink:0}}></div><div style={{flex:1}}><div style={{fontSize:11}}>{n.headline}</div><div style={{fontSize:9,color:"#6b7280",marginTop:2}}><a href={n.url} target="_blank" rel="noopener noreferrer" style={{color:"#22d3ee",textDecoration:"none"}}>{n.source}</a> | {n.age}</div></div></div>);})}</div>}
+          <div><div style={{fontSize:11,color:"#9ca3af",marginBottom:8}}>LIVE NEWS</div>{liveNews.length>0?liveNews.map(function(n,i){return(<div key={i} style={{background:i%2===0?"#111827":"transparent",borderRadius:6,padding:10,marginBottom:4}}><div style={{fontSize:12,fontWeight:600,marginBottom:4}}>{n.headline}</div><div style={{fontSize:10,color:"#94a3b8",marginBottom:4}}>{n.summary?n.summary.substring(0,120)+"...":""}</div><div style={{fontSize:9,color:"#6b7280"}}><a href={n.url} target="_blank" rel="noopener noreferrer" style={{color:"#22d3ee",textDecoration:"none"}}>{n.source}</a> | {timeAgo(n.time)}</div></div>);}):(<div style={{fontSize:11,color:"#64748b",padding:10}}>Loading news...</div>)}</div>
         </div>
-        <div style={{textAlign:"center",marginTop:12,fontSize:9,color:"#475569"}}>Not financial advice | Prices from Finnhub</div>
+        <div style={{textAlign:"center",marginTop:12,fontSize:9,color:"#475569"}}>Not financial advice | Prices and news from Finnhub</div>
       </div>
     </div>
   );
 }
+
+                        
