@@ -100,7 +100,13 @@ export default function Dashboard() {
 
   function fmt(p) { return p ? (p > 1000 ? p.toLocaleString(undefined,{maximumFractionDigits:0}) : p.toFixed(2)) : "0.00"; }
   function timeAgo(ts) { if (!ts) return ""; var diff = Date.now() - ts * 1000; var hrs = Math.floor(diff / 3600000); if (hrs < 1) return "now"; if (hrs < 24) return hrs + "h"; return Math.floor(hrs / 24) + "d"; }
-​​​​​​​​​​​return (
+
+  var info = DEFAULT_DATA[selected] || { name: selected, contextType: "NEW", marketContext: {market:50,stock:50}, contextNarrative: "No analysis yet.", attribution: [], signal: {action:"ANALYZE",confidence:0,reasoning:"Ask Claude to analyze."}, summary: "No data." };
+  var pr = prices[selected] || { price: 0, change: 0, changePercent: 0 };
+  var liveNews = news[selected] || [];
+
+  return (
+
     <div>
       <Head><title>Stock Dashboard</title></Head>
       <div style={{minHeight:"100vh",background:"#0f172a",padding:12,fontFamily:"system-ui",color:"white"}}>
