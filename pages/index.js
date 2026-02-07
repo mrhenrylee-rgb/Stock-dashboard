@@ -100,8 +100,7 @@ export default function Dashboard() {
 
   function fmt(p) { return p ? (p > 1000 ? p.toLocaleString(undefined,{maximumFractionDigits:0}) : p.toFixed(2)) : "0.00"; }
   function timeAgo(ts) { if (!ts) return ""; var diff = Date.now() - ts * 1000; var hrs = Math.floor(diff / 3600000); if (hrs < 1) return "now"; if (hrs < 24) return hrs + "h"; return Math.floor(hrs / 24) + "d"; }
-​​​​​​​​​​​​​​​​
-  return (
+​​​​​​​​​​​return (
     <div>
       <Head><title>Stock Dashboard</title></Head>
       <div style={{minHeight:"100vh",background:"#0f172a",padding:12,fontFamily:"system-ui",color:"white"}}>
