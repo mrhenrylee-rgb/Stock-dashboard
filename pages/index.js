@@ -38,9 +38,10 @@ export default function Dashboard() {
   var lastUpdate = updateState[0];
   var setLastUpdate = updateState[1];
 
-  function fetchPrices() {
+function fetchPrices() {
     setLoading(true);
     fetch("/api/stocks?symbols=" + watchlist.join(","))
+      .then(function(r) { return r.json(); })
 
       .then(function(r) { return r.json(); })
       .then(function(data) {
