@@ -38,6 +38,10 @@ export default function Dashboard() {
   var lastUpdate = updateState[0];
   var setLastUpdate = updateState[1];
 
+    var newsState = useState({});
+  var news = newsState[0];
+  var setNews = newsState[1];
+
 function fetchPrices(tickers) {
     var syms = tickers || watchlist;
     setLoading(true);
