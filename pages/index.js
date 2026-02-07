@@ -100,6 +100,10 @@ function fetchPrices(tickers) {
     fetchPrices(watchlist);
   }, [watchlist]);
 
+    useEffect(function() {
+    if (selected) fetchNews(selected);
+  }, [selected]);
+
 
   function addTicker() {
     var t = newTicker.toUpperCase().trim();
